@@ -1,26 +1,186 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-nexus-glow: hsl(var(--nexus-glow));
+  --color-nexus-surface: hsl(var(--nexus-surface));
+  --color-nexus-surface-elevated: hsl(var(--nexus-surface-elevated));
+  --color-nexus-text-secondary: hsl(var(--nexus-text-secondary));
+  --color-nexus-border-subtle: hsl(var(--nexus-border-subtle));
+  --color-nexus-success: hsl(var(--nexus-success));
+  --color-nexus-warning: hsl(var(--nexus-warning));
+  --color-nexus-info: hsl(var(--nexus-info));
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: 0 0% 98%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 20% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 20% 10%;
+  --primary: 152 60% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 14% 94%;
+  --secondary-foreground: 220 20% 15%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 10% 46%;
+  --accent: 152 50% 94%;
+  --accent-foreground: 152 60% 25%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 14% 90%;
+  --input: 220 14% 90%;
+  --ring: 152 60% 42%;
+  --radius: 0.625rem;
+  --nexus-glow: 152 60% 42%;
+  --nexus-surface: 220 20% 97%;
+  --nexus-surface-elevated: 0 0% 100%;
+  --nexus-text-secondary: 220 10% 50%;
+  --nexus-border-subtle: 220 14% 92%;
+  --nexus-success: 152 60% 42%;
+  --nexus-warning: 38 92% 50%;
+  --nexus-info: 217 91% 60%;
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 152 60% 42%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 152 50% 94%;
+  --sidebar-accent-foreground: 152 60% 25%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 152 60% 42%;
+}
+
+.dark {
+  --background: 222 30% 6%;
+  --foreground: 210 30% 94%;
+  --card: 222 25% 9%;
+  --card-foreground: 210 30% 94%;
+  --popover: 222 25% 9%;
+  --popover-foreground: 210 30% 94%;
+  --primary: 152 60% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 222 20% 14%;
+  --secondary-foreground: 210 30% 90%;
+  --muted: 222 20% 14%;
+  --muted-foreground: 215 15% 55%;
+  --accent: 152 40% 12%;
+  --accent-foreground: 152 60% 70%;
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 222 20% 16%;
+  --input: 222 20% 16%;
+  --ring: 152 60% 45%;
+  --nexus-glow: 152 60% 45%;
+  --nexus-surface: 222 25% 8%;
+  --nexus-surface-elevated: 222 25% 11%;
+  --nexus-text-secondary: 215 15% 55%;
+  --nexus-border-subtle: 222 20% 14%;
+  --nexus-success: 152 60% 45%;
+  --nexus-warning: 38 92% 50%;
+  --nexus-info: 217 91% 60%;
+  --sidebar-background: 222 30% 6%;
+  --sidebar-foreground: 210 30% 90%;
+  --sidebar-primary: 152 60% 45%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 152 40% 12%;
+  --sidebar-accent-foreground: 152 60% 70%;
+  --sidebar-border: 222 20% 16%;
+  --sidebar-ring: 152 60% 45%;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: "Inter", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Grotesk", sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .nexus-gradient {
+    background: linear-gradient(135deg, hsl(152 60% 42%), hsl(170 60% 38%), hsl(152 60% 50%));
+  }
+
+  .nexus-gradient-dark {
+    background: linear-gradient(135deg, hsl(152 60% 45%), hsl(170 60% 40%), hsl(152 60% 52%));
+  }
+
+  .nexus-glow {
+    box-shadow: 0 0 30px -5px hsl(152 60% 42% / 0.3), 0 0 60px -10px hsl(152 60% 42% / 0.15);
+  }
+
+  .dark .nexus-glow {
+    box-shadow: 0 0 30px -5px hsl(152 60% 45% / 0.4), 0 0 60px -10px hsl(152 60% 45% / 0.2);
+  }
+
+  .nexus-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04), 0 4px 12px hsl(0 0% 0% / 0.03);
+  }
+
+  .dark .nexus-card {
+    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.2), 0 4px 12px hsl(0 0% 0% / 0.15);
+  }
+
+  .nexus-text-gradient {
+    background-image: linear-gradient(135deg, hsl(152 60% 42%), hsl(170 60% 38%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .nexus-text-gradient {
+    background-image: linear-gradient(135deg, hsl(152 60% 55%), hsl(170 60% 50%));
+  }
 }
