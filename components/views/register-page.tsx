@@ -116,7 +116,7 @@ export function RegisterPage() {
           <form className="space-y-4" onSubmit={handleRegister}>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Full Name
+                First Name
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -163,7 +163,7 @@ export function RegisterPage() {
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Full Name
+               Phone Number
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
