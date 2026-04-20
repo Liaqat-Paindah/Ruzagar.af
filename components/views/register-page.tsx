@@ -97,18 +97,18 @@ export function RegisterPage() {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+    <div className=" flex items-center justify-center bg-background px-4 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl font-bold text-foreground">
+          <h1 className="font-display text-3xl font-extrabold text-foreground">
             Create Account
           </h1>
           <p className="text-muted-foreground mt-2">
-            Join Ruzagar.af and start your career journey
+            Join Ruzgar.af and start your career journey
           </p>
         </div>
 
@@ -125,7 +125,7 @@ export function RegisterPage() {
                   value={first_name}
                   onChange={(e) => setFirst_name(e.target.value)}
                   placeholder="First Name"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
@@ -141,7 +141,7 @@ export function RegisterPage() {
                   value={last_Name}
                   onChange={(e) => setLast_Name(e.target.value)}
                   placeholder="last Name"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
@@ -157,7 +157,7 @@ export function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
@@ -172,7 +172,7 @@ export function RegisterPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="070 000 0000"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="********"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-10 py-2 rounded-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
                 <button
                   type="button"
@@ -215,7 +215,7 @@ export function RegisterPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="********"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
@@ -223,7 +223,7 @@ export function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full nexus-gradient text-primary-foreground py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md mt-2"
+              className="w-full nexus-gradient text-primary-foreground py-2 rounded-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md mt-2"
             >
               Create Account
               {loading ? (
