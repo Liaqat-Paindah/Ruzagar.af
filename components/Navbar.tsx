@@ -1,11 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
-import { Briefcase, GraduationCap, LogIn, UserPlus, Menu, X, FileText, ChevronDown, ClipboardList, FileSearch } from "lucide-react";
+import {
+  Briefcase,
+  GraduationCap,
+  LogIn,
+  UserPlus,
+  Menu,
+  X,
+  FileText,
+  ChevronDown,
+  ClipboardList,
+  FileSearch,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "./provider/authContext";
+import { supabase } from "@/utils/supabase/supabase";
 
 const navLinks = [
   { to: "/", label: "Jobs", icon: Briefcase },
@@ -24,6 +37,8 @@ const authLinks = [
 ];
 
 export const Navbar = () => {
+  const { user, isAuthenticated, profile } = useAuth(); // Replace with your actual auth hook
+  const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tenderOpen, setTenderOpen] = useState(false);
@@ -33,8 +48,17 @@ export const Navbar = () => {
   const isTenderActive = pathname.startsWith("/tenders");
 
   useEffect(() => {
+    if (!isAuthenticated && !user) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, user, router]);
+
+  useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setTenderOpen(false);
       }
     };
@@ -46,6 +70,15 @@ export const Navbar = () => {
     setMobileOpen(false);
     setTenderOpen(false);
   }, [pathname]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Logout error:", error);
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -91,7 +124,9 @@ export const Navbar = () => {
             >
               <FileText className="h-4 w-4" />
               Tenders
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${tenderOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${tenderOpen ? "rotate-180" : ""}`}
+              />
             </button>
 
             <AnimatePresence>
@@ -122,30 +157,51 @@ export const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          {authLinks.map((link) => {
-            const isPrimary = link.to === "/register";
-            return (
-              <Link
-                key={link.to}
-                href={link.to}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  isPrimary
-                    ? "nexus-gradient text-primary-foreground hover:opacity-90 shadow-md"
-                    : "border border-border text-foreground hover:bg-secondary"
-                }`}
+          {!user ? (
+            <>
+              {authLinks.map((link) => {
+                const isPrimary = link.to === "/register";
+                return (
+                  <Link
+                    key={link.to}
+                    href={link.to}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isPrimary
+                        ? "nexus-gradient text-primary-foreground hover:opacity-90 shadow-md"
+                        : "border border-border text-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <link.icon className="h-4 w-4" />
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </>
+          ) : (
+            <>
+              <span
+                onClick={handleLogout}
+                className={`flex items-center cursor-pointer gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all 
+                    }`}
               >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            );
-          })}
+                Logout
+              </span>
+            </>
+          )}
         </div>
 
         {/* Mobile */}
         <div className="flex md:hidden items-center gap-2">
           <ThemeToggle />
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 rounded-lg hover:bg-secondary">
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 rounded-lg hover:bg-secondary"
+          >
+            {mobileOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
@@ -180,7 +236,9 @@ export const Navbar = () => {
                   <FileText className="h-4 w-4" />
                   Tenders
                 </span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${mobileTenderOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${mobileTenderOpen ? "rotate-180" : ""}`}
+                />
               </button>
               <AnimatePresence>
                 {mobileTenderOpen && (
@@ -194,7 +252,10 @@ export const Navbar = () => {
                       <Link
                         key={link.label}
                         href={link.to}
-                        onClick={() => { setMobileOpen(false); setMobileTenderOpen(false); }}
+                        onClick={() => {
+                          setMobileOpen(false);
+                          setMobileTenderOpen(false);
+                        }}
                         className="flex items-center gap-3 pl-11 pr-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                       >
                         <link.icon className="h-4 w-4" />
