@@ -565,7 +565,7 @@ export const Navbar = () => {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-all"
+                  className="flex items-center gap-3 px-3 py-3 cursor-pointer rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-all"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out

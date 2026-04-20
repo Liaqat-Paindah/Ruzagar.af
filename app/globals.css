@@ -37,8 +37,8 @@
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
-  --font-sans: "Inter", sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Nunito", sans-serif;
+  --font-display: "Nunito", sans-serif;
 }
 
 :root {
@@ -130,7 +130,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: "Inter", sans-serif;
+    font-family: "Nunito", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -141,7 +141,7 @@
   h4,
   h5,
   h6 {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: "Nunito", sans-serif;
   }
 }
 
