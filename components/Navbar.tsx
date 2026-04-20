@@ -37,7 +37,7 @@ const authLinks = [
 ];
 
 export const Navbar = () => {
-  const { user, isAuthenticated, profile } = useAuth(); // Replace with your actual auth hook
+  const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -46,12 +46,6 @@ export const Navbar = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isTenderActive = pathname.startsWith("/tenders");
-
-  useEffect(() => {
-    if (!isAuthenticated && !user) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -267,17 +261,27 @@ export const Navbar = () => {
               </AnimatePresence>
 
               <div className="border-t border-border my-2" />
-              {authLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  href={link.to}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+              {!user ? (
+                authLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    href={link.to}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+                  >
+                    <link.icon className="h-4 w-4" />
+                    {link.label}
+                  </Link>
+                ))
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-secondary transition-colors text-left"
                 >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </Link>
-              ))}
+                  Logout
+                </button>
+              )}
             </div>
           </motion.div>
         )}
