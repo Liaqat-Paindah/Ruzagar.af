@@ -11,7 +11,7 @@ import {
 
 type AuthContextType = {
   user: User | null;
-  profile: Profile;
+  profile: Profile | null;
   isAuthenticated: boolean;
   loading: boolean;
 };
@@ -29,7 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -40,50 +40,68 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) {
       console.error("Error fetching profile:", error);
-      return;
+      return null;
     }
 
-    setProfile(data);
+    return data as Profile;
   };
 
   useEffect(() => {
-    const init = async () => {
-      setLoading(true);
+    let isMounted = true;
 
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error(error);
-        setLoading(false);
+    const syncAuthState = async (currentUser: User | null) => {
+      if (!isMounted) {
         return;
       }
 
-      const currentUser = data.user;
-
       setUser(currentUser);
 
-      if (currentUser) {
-        await fetchUserProfile(currentUser.id);
+      if (!currentUser) {
+        setProfile(null);
+        return;
       }
 
-      setLoading(false);
+      const userProfile = await fetchUserProfile(currentUser.id);
+
+      if (!isMounted) {
+        return;
+      }
+
+      setProfile(userProfile);
+    };
+
+    const init = async () => {
+      setLoading(true);
+
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error(error);
+      }
+
+      await syncAuthState(session?.user ?? null);
+
+      if (isMounted) {
+        setLoading(false);
+      }
     };
 
     init();
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        const currentUser = session?.user ?? null;
+        await syncAuthState(session?.user ?? null);
 
-        setUser(currentUser);
-
-        if (currentUser) {
-          await fetchUserProfile(currentUser.id);
-        } else {
-          setProfile(null);
+        if (isMounted) {
+          setLoading(false);
         }
       },
     );
 
     return () => {
+      isMounted = false;
       listener.subscription.unsubscribe();
     };
   }, []);
