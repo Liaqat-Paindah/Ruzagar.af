@@ -324,7 +324,7 @@ export const Navbar = () => {
 
               {/* Create Job Button */}
               <Link
-                href="/jobs/create"
+                href="/dashboard/jobs/create"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-linear-to-r from-primary/10 via-emerald-500/10 to-blue-500/10 border border-primary/20 text-primary hover:border-primary/40 hover:shadow-md transition-all"
               >
                 <PlusCircle className="h-4 w-4" />
