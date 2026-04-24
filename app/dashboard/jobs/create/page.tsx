@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useFormik } from "formik";
 import {
   Loader2,
@@ -20,15 +20,17 @@ import {
 import Image from "next/image";
 import * as Yup from "yup";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePostJobs } from "@/hooks/useJobs";
+import { useAuth } from "@/components/provider/authContext";
 
-type JobFormValues = {
+export type JobFormValues = {
   title: string;
   company: string;
   location: string;
   salary: string;
   vacancies: number;
   jobType: string;
-  experienceLevel: string;
+  gender: string;
   skills: string;
   description: string;
   deadline: string;
@@ -37,6 +39,7 @@ type JobFormValues = {
   remoteOption: string;
   status: string;
   companyLogo: File | null;
+  userId: string;
 };
 
 const labelClassName = "mb-1.5 block text-sm font-medium text-foreground";
@@ -45,15 +48,13 @@ const fieldClassName =
 const inputWithIconClassName = `${fieldClassName} pl-10`;
 const iconClassName =
   "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground";
-const dateIconClassName =
-  "absolute left-3 top-3 h-4 w-4 text-muted-foreground";
-const errorClassName =
-  "mt-1 flex items-center gap-1 text-xs text-destructive";
+const dateIconClassName = "absolute left-3 top-3 h-4 w-4 text-muted-foreground";
+const errorClassName = "mt-1 flex items-center gap-1 text-xs text-destructive";
 
 const appendFormDataValue = (
   formData: FormData,
   key: keyof JobFormValues,
-  value: JobFormValues[keyof JobFormValues]
+  value: JobFormValues[keyof JobFormValues],
 ) => {
   if (value === null || value === undefined) {
     return;
@@ -76,7 +77,7 @@ const validationSchema = Yup.object({
     .min(1, "At least 1 vacancy")
     .required("Number of vacancies is required"),
   jobType: Yup.string().required("Job type is required"),
-  experienceLevel: Yup.string().required("Experience level is required"),
+  gender: Yup.string().required("Gender is required"),
   skills: Yup.string().required("Skills are required"),
   description: Yup.string()
     .min(50, "Description must be at least 50 characters")
@@ -96,6 +97,9 @@ const validationSchema = Yup.object({
 });
 
 export default function CreateJobs() {
+  const { user } = useAuth();
+  const userId = user?.id || "";
+  const { mutateAsync, isPending } = usePostJobs();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
@@ -116,50 +120,44 @@ export default function CreateJobs() {
       salary: "",
       vacancies: 1,
       jobType: "Full-time",
-      experienceLevel: "Mid",
+      gender: "Mid",
       skills: "",
       description: "",
       deadline: "",
-      postedDate: new Date().toISOString().split('T')[0],
+      postedDate: new Date().toISOString().split("T")[0],
       contactEmail: "",
       remoteOption: "Onsite",
       status: "Open",
       companyLogo: null,
+      userId: userId,
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
-        // Create FormData for file upload
         const formData = new FormData();
         (
           Object.entries(values) as [
             keyof JobFormValues,
-            JobFormValues[keyof JobFormValues]
+            JobFormValues[keyof JobFormValues],
           ][]
         ).forEach(([key, value]) => {
           appendFormDataValue(formData, key, value);
         });
 
-        // Make API call here
-        // const response = await fetch('/api/jobs', {
-        //   method: 'POST',
-        //   body: formData,
-        // });
-
-        console.log("Form submitted:", values);
-        
-        // Reset form after successful submission
+        await mutateAsync(formData);
         resetForm();
         setPreviewUrl(null);
-        alert("Job posted successfully!");
-      } catch (error) {
-        console.error("Error posting job:", error);
-        alert("Failed to post job. Please try again.");
       } finally {
         setSubmitting(false);
       }
     },
   });
+
+  useEffect(() => {
+    if (userId) {
+      setFieldValue("userId", userId);
+    }
+  }, [setFieldValue, userId]);
 
   const handleLogoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];
@@ -169,13 +167,13 @@ export default function CreateJobs() {
         alert("File size must be less than 5MB");
         return;
       }
-      
+
       // Validate file type
       if (!file.type.startsWith("image/")) {
         alert("Please upload an image file");
         return;
       }
-      
+
       setFieldValue("companyLogo", file);
       setPreviewUrl(URL.createObjectURL(file));
     }
@@ -205,8 +203,12 @@ export default function CreateJobs() {
         >
           {/* Header */}
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-foreground">Post a New Job</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Fill in the details below to create a job listing</p>
+            <h1 className="text-2xl font-bold text-foreground">
+              Post a New Job
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Fill in the details below to create a job listing
+            </p>
           </div>
 
           {/* Main Card */}
@@ -239,9 +241,7 @@ export default function CreateJobs() {
                 {/* Left Column */}
                 <div className="space-y-4">
                   <div>
-                    <label className={labelClassName}>
-                      Job Title *
-                    </label>
+                    <label className={labelClassName}>Job Title *</label>
                     <div className="relative">
                       <Briefcase className={iconClassName} />
                       <input
@@ -269,9 +269,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Company Name *
-                    </label>
+                    <label className={labelClassName}>Company Name *</label>
                     <div className="relative">
                       <Building2 className={iconClassName} />
                       <input
@@ -299,9 +297,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Location *
-                    </label>
+                    <label className={labelClassName}>Location *</label>
                     <div className="relative">
                       <MapPin className={iconClassName} />
                       <input
@@ -329,9 +325,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Salary *
-                    </label>
+                    <label className={labelClassName}>Salary *</label>
                     <div className="relative">
                       <DollarSign className={iconClassName} />
                       <input
@@ -359,9 +353,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Vacancies *
-                    </label>
+                    <label className={labelClassName}>Vacancies *</label>
                     <div className="relative">
                       <Users className={iconClassName} />
                       <input
@@ -389,9 +381,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Job Type *
-                    </label>
+                    <label className={labelClassName}>Job Type *</label>
                     <select
                       name="jobType"
                       value={values.jobType}
@@ -420,32 +410,27 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Experience Level *
-                    </label>
+                    <label className={labelClassName}>Gender *</label>
                     <select
-                      name="experienceLevel"
-                      value={values.experienceLevel}
+                      name="gender"
+                      value={values.gender}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={fieldClassName}
                     >
-                      <option value="Entry">Entry Level</option>
-                      <option value="Junior">Junior</option>
-                      <option value="Mid">Mid Level</option>
-                      <option value="Senior">Senior</option>
-                      <option value="Lead">Lead</option>
-                      <option value="Executive">Executive</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="others">Others</option>
                     </select>
                     <AnimatePresence>
-                      {touched.experienceLevel && errors.experienceLevel && (
+                      {touched.gender && errors.gender && (
                         <motion.p
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           className={errorClassName}
                         >
-                          <AlertCircle className="h-3 w-3" /> {errors.experienceLevel}
+                          <AlertCircle className="h-3 w-3" /> {errors.gender}
                         </motion.p>
                       )}
                     </AnimatePresence>
@@ -485,9 +470,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Remote Option *
-                    </label>
+                    <label className={labelClassName}>Remote Option *</label>
                     <select
                       name="remoteOption"
                       value={values.remoteOption}
@@ -507,16 +490,15 @@ export default function CreateJobs() {
                           exit={{ opacity: 0, y: -10 }}
                           className={errorClassName}
                         >
-                          <AlertCircle className="h-3 w-3" /> {errors.remoteOption}
+                          <AlertCircle className="h-3 w-3" />{" "}
+                          {errors.remoteOption}
                         </motion.p>
                       )}
                     </AnimatePresence>
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Status *
-                    </label>
+                    <label className={labelClassName}>Status *</label>
                     <select
                       name="status"
                       value={values.status}
@@ -543,9 +525,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Contact Email *
-                    </label>
+                    <label className={labelClassName}>Contact Email *</label>
                     <div className="relative">
                       <Mail className={iconClassName} />
                       <input
@@ -566,16 +546,15 @@ export default function CreateJobs() {
                           exit={{ opacity: 0, y: -10 }}
                           className={errorClassName}
                         >
-                          <AlertCircle className="h-3 w-3" /> {errors.contactEmail}
+                          <AlertCircle className="h-3 w-3" />{" "}
+                          {errors.contactEmail}
                         </motion.p>
                       )}
                     </AnimatePresence>
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Deadline *
-                    </label>
+                    <label className={labelClassName}>Deadline *</label>
                     <div className="relative">
                       <Calendar className={iconClassName} />
                       <input
@@ -602,9 +581,7 @@ export default function CreateJobs() {
                   </div>
 
                   <div>
-                    <label className={labelClassName}>
-                      Posted Date *
-                    </label>
+                    <label className={labelClassName}>Posted Date *</label>
                     <div className="relative">
                       <Calendar className={iconClassName} />
                       <input
@@ -624,7 +601,8 @@ export default function CreateJobs() {
                           exit={{ opacity: 0, y: -10 }}
                           className={errorClassName}
                         >
-                          <AlertCircle className="h-3 w-3" /> {errors.postedDate}
+                          <AlertCircle className="h-3 w-3" />{" "}
+                          {errors.postedDate}
                         </motion.p>
                       )}
                     </AnimatePresence>
@@ -634,9 +612,7 @@ export default function CreateJobs() {
 
               {/* Company Logo */}
               <div>
-                <label className={labelClassName}>
-                  Company Logo *
-                </label>
+                <label className={labelClassName}>Company Logo *</label>
                 <div className="flex items-center gap-4">
                   <input
                     type="file"
@@ -684,9 +660,7 @@ export default function CreateJobs() {
 
               {/* Job Description */}
               <div>
-                <label className={labelClassName}>
-                  Job Description *
-                </label>
+                <label className={labelClassName}>Job Description *</label>
                 <div className="relative">
                   <FileText className={dateIconClassName} />
                   <textarea
@@ -712,12 +686,16 @@ export default function CreateJobs() {
                   )}
                 </AnimatePresence>
                 <div className="mt-1 flex justify-between items-center">
-                  <p className="text-xs text-muted-foreground">Minimum 50 characters</p>
-                  <p className={`text-xs font-medium ${
-                    values.description.length >= 50 
-                      ? "text-nexus-success"
-                      : "text-muted-foreground"
-                  }`}>
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 50 characters
+                  </p>
+                  <p
+                    className={`text-xs font-medium ${
+                      values.description.length >= 50
+                        ? "text-nexus-success"
+                        : "text-muted-foreground"
+                    }`}
+                  >
                     {values.description.length}/50
                   </p>
                 </div>
@@ -727,12 +705,12 @@ export default function CreateJobs() {
               <div className="flex gap-3 border-t border-border pt-4">
                 <motion.button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isPending}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="nexus-gradient flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || isPending ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="animate-spin" size={16} />
                       Posting Job...
