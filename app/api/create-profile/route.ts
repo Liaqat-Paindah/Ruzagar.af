@@ -1,4 +1,4 @@
-import { supabase } from "@/utils/supabase/supabase";
+import { supabaseAdmin } from "@/utils/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -6,7 +6,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const { email, first_name, last_Name, phone, user_id } = body;
-    const { error } = await supabase.from("profiles").insert({
+
+    if (!email || !first_name || !last_Name || !user_id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Missing required fields",
+        },
+        { status: 400 },
+      );
+    }
+
+    const { error } = await supabaseAdmin.from("profiles").insert({
       id: user_id,
       email,
       first_name,
@@ -17,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "Something is wrong!",
+          message: error.message,
         },
         { status: 500 },
       );
@@ -27,8 +38,10 @@ export async function POST(req: NextRequest) {
       message: "Account created successfully!",
     });
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Server error";
+
     return NextResponse.json(
-      { success: false, message: "Server error" },
+      { success: false, message },
       { status: 500 },
     );
   }
