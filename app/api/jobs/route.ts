@@ -1,4 +1,4 @@
-import { supabase } from "@/utils/supabase/supabase";
+import { supabaseAdmin } from "@/utils/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     }
 
     const fileName = `${Date.now()}-${companyLogo.name}`;
-    const { error: fileError } = await supabase.storage
+    const { error: fileError } = await supabaseAdmin.storage
       .from("company-logos")
       .upload(fileName, companyLogo, {
         upsert: false,
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseAdmin.storage
       .from("company-logos")
       .getPublicUrl(fileName);
 
@@ -106,14 +106,14 @@ export async function POST(req: NextRequest) {
       userId,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("jobs")
       .insert(jobPayload)
       .select()
       .single();
 
     if (error) {
-      await supabase.storage.from("company-logos").remove([fileName]);
+      await supabaseAdmin.storage.from("company-logos").remove([fileName]);
 
       return NextResponse.json(
         {
