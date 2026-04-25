@@ -53,7 +53,7 @@ const UserLinks = [
     icon: Briefcase,
   },
   {
-    to: "/applications",
+    to: "/dashboard/applications",
     label: "Applications",
     icon: FileText,
   },

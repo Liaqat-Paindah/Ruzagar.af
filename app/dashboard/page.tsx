@@ -39,6 +39,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import Link from "next/link";
+import Loading from "../loading";
 
 // Mock data - Replace with actual API calls
 const applicationStats = {
@@ -145,15 +146,7 @@ export default function Dashboard() {
 
   if (loading || !isAuthenticated || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative w-16 h-16 mx-auto">
-            <div className="absolute inset-0 rounded-full border-2 border-border"></div>
-            <div className="absolute inset-0 rounded-full border-2 border-t-primary animate-spin"></div>
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
+      <><Loading></Loading></>
     );
   }
 
