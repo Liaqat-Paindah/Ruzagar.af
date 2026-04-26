@@ -1,5 +1,9 @@
 import { supabaseAdmin } from "@/utils/supabase/admin";
+import { supabase } from "@/utils/supabase/supabase";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
+import { toast } from "sonner";
 
 export async function POST(req: NextRequest) {
   try {
@@ -142,6 +146,45 @@ export async function POST(req: NextRequest) {
         message,
       },
       { status: 500 },
+    );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const { data: jobsData, error: jobsError } = await supabase
+      .from("jobs")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (jobsError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: jobsError.message,
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "All jobs fetch successfully...!",
+        data: jobsData,
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: error?.message,
+      },
+      {
+        status: 500,
+      },
     );
   }
 }

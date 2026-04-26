@@ -22,25 +22,8 @@ import * as Yup from "yup";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePostJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/components/provider/authContext";
+import { JobFormValues } from "@/type/jobs";
 
-export type JobFormValues = {
-  title: string;
-  company: string;
-  location: string;
-  salary: string;
-  vacancies: number;
-  jobType: string;
-  gender: string;
-  skills: string;
-  description: string;
-  deadline: string;
-  postedDate: string;
-  contactEmail: string;
-  remoteOption: string;
-  status: string;
-  companyLogo: File | null;
-  userId: string;
-};
 
 const labelClassName = "mb-1.5 block text-sm font-medium text-foreground";
 const fieldClassName =

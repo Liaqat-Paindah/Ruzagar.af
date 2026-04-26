@@ -1,6 +1,6 @@
 "use client";
 
-import { Job } from "@/data/jobs";
+import { Job } from "@/type/jobs";
 import {
   MapPin,
   Clock,
@@ -15,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
 
 interface JobCardProps {
   job: Job;
@@ -24,8 +25,17 @@ interface JobCardProps {
 export const JobCard = ({ job, index }: JobCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-
-  const isTrending = job.urgent || index % 4 === 0;
+  const skillList = job.skills
+    .split(",")
+    .map((skill) => skill.trim())
+    .filter(Boolean);
+  const postedDateLabel = job.postedDate
+    ? new Date(job.postedDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "N/A";
 
   return (
     <Link href={`/jobs/${job.id}`}>
@@ -38,9 +48,9 @@ export const JobCard = ({ job, index }: JobCardProps) => {
         onHoverEnd={() => setIsHovered(false)}
         className="group relative cursor-pointer"
       >
-        <div className="absolute -inset-px rounded-2xl bg-linear-to-r from-primary/0 via-primary/35 to-sky-500/0 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100 dark:via-cyan-400/40 dark:to-fuchsia-500/0" />
+        <div className="absolute -inset-px rounded-sm bg-linear-to-r from-primary/0 via-primary/35 to-sky-500/0 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100 dark:via-cyan-400/40 dark:to-fuchsia-500/0" />
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-card text-card-foreground shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] transition-all duration-500 dark:shadow-[0_24px_60px_-32px_rgba(0,0,0,0.75)]">
+        <div className="relative overflow-hidden rounded-sm border border-border/70 bg-card text-card-foreground shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] transition-all duration-500 dark:shadow-[0_24px_60px_-32px_rgba(0,0,0,0.75)]">
           <motion.div
             className="absolute inset-0 bg-linear-to-br from-primary/0 via-primary/0 to-sky-500/0 transition-all duration-700 group-hover:from-primary/5 group-hover:via-transparent group-hover:to-sky-500/5 dark:group-hover:from-cyan-400/5 dark:group-hover:to-fuchsia-500/5"
             animate={{
@@ -60,7 +70,12 @@ export const JobCard = ({ job, index }: JobCardProps) => {
                 <div className="absolute inset-0 rounded-xl bg-linear-to-r from-primary/45 to-sky-500/45 opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-60 dark:from-cyan-400 dark:to-fuchsia-500" />
                 <div className="relative flex h-12 w-12 items-center justify-center rounded-xl border border-border/70 bg-linear-to-br from-background to-muted shadow-sm transition-all duration-300 group-hover:border-primary/40 dark:group-hover:border-cyan-400/40 md:h-14 md:w-14">
                   <span className="font-display text-base font-bold text-foreground md:text-lg">
-                    {job.company.charAt(0)}
+                    <Image
+                      src={job.companyLogo}
+                      alt={job.company.charAt(0)}
+                      width={40}
+                      height={40}
+                    ></Image>
                   </span>
                 </div>
               </motion.div>
@@ -71,20 +86,12 @@ export const JobCard = ({ job, index }: JobCardProps) => {
                     <h3 className="truncate font-display text-lg font-semibold text-foreground transition-colors group-hover:text-primary dark:group-hover:text-cyan-400 md:text-xl">
                       {job.title}
                     </h3>
-                    {isTrending && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary dark:border-cyan-400/30 dark:bg-cyan-400/10 dark:text-cyan-300"
-                      >
-                        <TrendingUp className="h-2.5 w-2.5" />
-                        Trending
-                      </motion.span>
-                    )}
                   </div>
                   <div className="mt-1 flex items-center gap-2">
                     <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">{job.company}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {job.company}
+                    </p>
                   </div>
                 </div>
 
@@ -114,10 +121,6 @@ export const JobCard = ({ job, index }: JobCardProps) => {
               </div>
             </div>
 
-            <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-              {job.description}
-            </p>
-
             <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/70 px-2.5 py-1">
                 <MapPin className="h-3.5 w-3.5 text-primary dark:text-cyan-300" />
@@ -128,38 +131,42 @@ export const JobCard = ({ job, index }: JobCardProps) => {
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/70 px-2.5 py-1">
                 <Briefcase className="h-3.5 w-3.5 text-sky-600 dark:text-fuchsia-300" />
                 <span className="text-xs text-foreground/80">
-                  {job.type}
+                  {job.jobType}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/70 px-2.5 py-1">
                 <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">{job.posted}</span>
+                <span className="text-xs text-muted-foreground">
+                  {postedDateLabel}
+                </span>
               </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-4 border-t border-border/70 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-wrap gap-1.5">
-                {job.tags.slice(0, 3).map((tag, tagIdx) => (
+                {skillList.slice(0, 3).map((skill, tagIdx) => (
                   <motion.span
-                    key={tag}
+                    key={skill}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.4 + index * 0.02 + tagIdx * 0.03 }}
                     className="rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-all hover:border-primary/40 hover:text-primary dark:hover:border-cyan-400/50 dark:hover:text-cyan-300"
                   >
-                    {tag}
+                    {skill}
                   </motion.span>
                 ))}
-                {job.tags.length > 3 && (
+                {skillList.length > 3 && (
                   <span className="px-2 py-1 text-[10px] text-muted-foreground">
-                    +{job.tags.length - 3}
+                    +{skillList.length - 3}
                   </span>
                 )}
               </div>
 
               <div className="flex items-center justify-between gap-3 sm:justify-end">
                 <div className="text-right">
-                  <span className="text-xs text-muted-foreground">Est. Salary</span>
+                  <span className="text-xs text-muted-foreground">
+                    Est. Salary
+                  </span>
                   <p className="whitespace-nowrap text-sm font-bold text-foreground">
                     {job.salary}
                   </p>
@@ -173,7 +180,7 @@ export const JobCard = ({ job, index }: JobCardProps) => {
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-1 text-[10px] text-muted-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className=" flex items-center gap-1 text-[10px] text-muted-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <Eye className="h-3 w-3" />
               <span>234 views today</span>
             </div>

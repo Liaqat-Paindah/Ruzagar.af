@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { jobs, jobTypes } from "@/data/jobs";
 import { JobCard } from "@/components/JobCard";
 import {
   Search,
@@ -12,6 +11,9 @@ import {
   Briefcase,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { GetJobs } from "@/hooks/useJobs";
+import { Job } from "@/type/jobs";
+import Loading from "@/app/loading";
 
 const stats = [
   { label: "Active Jobs", value: "2,400+", icon: Briefcase },
@@ -21,17 +23,27 @@ const stats = [
 ];
 
 export function HomePage() {
+  const { data, error, isPending } = GetJobs();
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState("All");
+  const jobs: Job[] = data?.data ?? [];
+  const jobTypes = ["All", ...new Set(jobs.map((job) => job.jobType))];
 
   const filtered = jobs.filter((job) => {
     const matchSearch =
       job.title.toLowerCase().includes(search.toLowerCase()) ||
       job.company.toLowerCase().includes(search.toLowerCase()) ||
-      job.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase()));
-    const matchType = activeType === "All" || job.type === activeType;
+      job.skills.toLowerCase().includes(search.toLowerCase());
+    const matchType = activeType === "All" || job.jobType === activeType;
     return matchSearch && matchType;
   });
+  if (isPending) {
+    return (
+      <>
+        <Loading></Loading>
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,12 +135,21 @@ export function HomePage() {
         </div>
 
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 sm:gap-5">
-          {filtered.map((job, index) => (
-            <JobCard key={job.id} job={job} index={index} />
-          ))}
+          {!isPending &&
+            filtered.map((job, index) => (
+              <JobCard key={job.id} job={job} index={index} />
+            ))}
         </div>
 
-        {filtered.length === 0 && (
+        {!isPending && error && (
+          <div className="py-16 text-center">
+            <p className="text-lg text-destructive">
+              Unable to load jobs right now.
+            </p>
+          </div>
+        )}
+
+        {!isPending && !error && filtered.length === 0 && (
           <div className="py-16 text-center">
             <p className="text-lg text-muted-foreground">
               No jobs found matching your criteria.
