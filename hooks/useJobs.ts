@@ -1,14 +1,8 @@
-import { JobFormValues } from "@/app/dashboard/jobs/create/page";
-import { useMutation } from "@tanstack/react-query";
+import { JobsResponse, PostJobResponse } from "@/type/jobs";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
-type PostJobResponse = {
-  success: boolean;
-  message: string;
-  data?: JobFormValues;
-};
 
 export const usePostJobs = () => {
   const router = useRouter();
@@ -37,5 +31,19 @@ export const usePostJobs = () => {
     onError: (error) => {
       toast.error(error.response?.data?.message || error.message);
     },
+  });
+};
+
+export const GetJobs = () => {
+  return useQuery({
+    queryKey: ["getJobs"],
+    queryFn: async () => {
+      const response = await axios.get<JobsResponse>("/api/jobs");
+      return response.data;
+    },
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
   });
 };
