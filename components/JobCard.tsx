@@ -165,7 +165,7 @@ export const JobCard = ({ job, index }: JobCardProps) => {
               <div className="flex items-center justify-between gap-3 sm:justify-end">
                 <div className="text-right">
                   <span className="text-xs text-muted-foreground">
-                    Est. Salary
+                     Salary
                   </span>
                   <p className="whitespace-nowrap text-sm font-bold text-foreground">
                     {job.salary}
