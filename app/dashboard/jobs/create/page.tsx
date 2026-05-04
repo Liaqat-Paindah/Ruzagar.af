@@ -23,7 +23,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePostJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/components/provider/authContext";
 import { JobFormValues } from "@/type/jobs";
-
+import RichTextEditor from "@/lib/editor";
+import { extractPlainTextFromRichText } from "@/lib/rich-text";
 
 const labelClassName = "mb-1.5 block text-sm font-medium text-foreground";
 const fieldClassName =
@@ -63,7 +64,17 @@ const validationSchema = Yup.object({
   gender: Yup.string().required("Gender is required"),
   skills: Yup.string().required("Skills are required"),
   description: Yup.string()
-    .min(50, "Description must be at least 50 characters")
+    .test("rich-text-required", "Description is required", (value) => {
+      return extractPlainTextFromRichText(value ?? "").length > 0;
+    })
+    .test(
+      "rich-text-min-length",
+      "Description must be at least 50 characters",
+      (value) => {
+        const textLength = extractPlainTextFromRichText(value ?? "").length;
+        return textLength === 0 || textLength >= 50;
+      },
+    )
     .required("Description is required"),
   deadline: Yup.date()
     .min(new Date(), "Deadline must be in the future")
@@ -592,7 +603,6 @@ export default function CreateJobs() {
                   </div>
                 </div>
               </div>
-
               {/* Company Logo */}
               <div>
                 <label className={labelClassName}>Company Logo *</label>
@@ -640,50 +650,14 @@ export default function CreateJobs() {
                   Upload a company logo (max 5MB, PNG, JPG, or JPEG)
                 </p>
               </div>
-
-              {/* Job Description */}
-              <div>
-                <label className={labelClassName}>Job Description *</label>
-                <div className="relative">
-                  <FileText className={dateIconClassName} />
-                  <textarea
-                    name="description"
-                    rows={6}
-                    placeholder="Provide a detailed job description including responsibilities, requirements, benefits, etc. (minimum 50 characters)"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={`${fieldClassName} resize-y pl-10`}
-                  />
-                </div>
-                <AnimatePresence>
-                  {touched.description && errors.description && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className={errorClassName}
-                    >
-                      <AlertCircle className="h-3 w-3" /> {errors.description}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-                <div className="mt-1 flex justify-between items-center">
-                  <p className="text-xs text-muted-foreground">
-                    Minimum 50 characters
-                  </p>
-                  <p
-                    className={`text-xs font-medium ${
-                      values.description.length >= 50
-                        ? "text-nexus-success"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {values.description.length}/50
-                  </p>
-                </div>
-              </div>
-
+              <RichTextEditor
+                value={values.description}
+                onChange={(html) => setFieldValue("description", html)}
+                onBlur={() => handleBlur("description")}
+                error={errors.description}
+                touched={touched.description}
+                minLength={50}
+              />
               {/* Form Actions */}
               <div className="flex gap-3 border-t border-border pt-4">
                 <motion.button
