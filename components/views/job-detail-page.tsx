@@ -28,6 +28,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { GetJobs } from "@/hooks/useJobs";
 import { toast } from "sonner";
+import { normalizeRichTextHtml } from "@/lib/rich-text";
 
 const formatDate = (value: string) => {
   if (!value) return "N/A";
@@ -70,6 +71,7 @@ export function JobDetailPage() {
     .split(",")
     .map((skill) => skill.trim())
     .filter(Boolean);
+  const descriptionHtml = normalizeRichTextHtml(job?.description ?? "");
 
   const handleApply = async () => {
     setIsApplying(true);
@@ -218,7 +220,16 @@ export function JobDetailPage() {
                 <MessageCircle className="h-5 w-5 text-primary" />
                 <h2 className="font-display text-lg font-semibold text-foreground">Job Description</h2>
               </div>
-              <p className="text-muted-foreground leading-relaxed">{job.description}</p>
+              {descriptionHtml ? (
+                <div
+                  className="prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-p:leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                />
+              ) : (
+                <p className="text-muted-foreground leading-relaxed">
+                  No description provided.
+                </p>
+              )}
 
               <div className="grid gap-4 md:grid-cols-3 mt-6">
                 <div className="rounded-sm border border-border bg-secondary/40 p-4">

@@ -4,6 +4,10 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 import { toast } from "sonner";
+import {
+  extractPlainTextFromRichText,
+  normalizeRichTextHtml,
+} from "@/lib/rich-text";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +25,7 @@ export async function POST(req: NextRequest) {
     const jobType = getValue("jobType");
     const gender = getValue("gender");
     const skills = getValue("skills");
-    const description = getValue("description");
+    const description = normalizeRichTextHtml(getValue("description"));
     const deadline = getValue("deadline");
     const postedDate = getValue("postedDate");
     const contactEmail = getValue("contactEmail");
@@ -65,6 +69,16 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           message: "Vacancies must be a valid number greater than 0",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (extractPlainTextFromRichText(description).length < 50) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Description must be at least 50 characters",
         },
         { status: 400 },
       );
