@@ -1,3 +1,5 @@
+  'use client'
+
 import { JobsResponse, PostJobResponse } from "@/type/jobs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
@@ -39,6 +41,23 @@ export const GetJobs = () => {
     queryKey: ["getJobs"],
     queryFn: async () => {
       const response = await axios.get<JobsResponse>("/api/jobs");
+      return response.data;
+    },
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+
+
+
+export const useGetJobsByUser  = () => {
+  return useQuery({
+    queryKey: ["getJobsApplication"],
+    queryFn: async () => {
+      const response = await axios.get("/api/application");
       return response.data;
     },
     retryOnMount: false,
