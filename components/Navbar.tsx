@@ -135,11 +135,15 @@ export const Navbar = () => {
   }, [pathname]);
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+
     if (error) {
       console.error("Logout error:", error);
     } else {
-      router.push("/login");
+      setUserMenuOpen(false);
+      setMobileOpen(false);
+      router.replace("/login");
+      router.refresh();
     }
   };
 
@@ -368,6 +372,7 @@ export const Navbar = () => {
                       </div>
                       <div className="p-2">
                         <button
+                          type="button"
                           onClick={handleLogout}
                           className="flex items-center gap-3 cursor-pointer w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-all"
                         >

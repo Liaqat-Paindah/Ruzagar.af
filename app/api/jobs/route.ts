@@ -1,9 +1,6 @@
 import { supabaseAdmin } from "@/utils/supabase/admin";
-import { supabase } from "@/utils/supabase/supabase";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { error } from "console";
+import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import { toast } from "sonner";
 import {
   extractPlainTextFromRichText,
   normalizeRichTextHtml,
@@ -11,6 +8,22 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: authError.message,
+        },
+        { status: 401 },
+      );
+    }
+
     const formData = await req.formData();
     const getValue = (key: string) => {
       const value = formData.get(key);
@@ -41,6 +54,26 @@ export async function POST(req: NextRequest) {
           message: "User id is required",
         },
         { status: 400 },
+      );
+    }
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized",
+        },
+        { status: 401 },
+      );
+    }
+
+    if (user.id !== userId) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "You can only post jobs for your own account",
+        },
+        { status: 403 },
       );
     }
 
@@ -104,6 +137,23 @@ export async function POST(req: NextRequest) {
     const { data: urlData } = supabaseAdmin.storage
       .from("company-logos")
       .getPublicUrl(fileName);
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profileData) {
+      await supabaseAdmin.storage.from("company-logos").remove([fileName]);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: profileError?.message ?? "Profile not found",
+        },
+        { status: 400 },
+      );
+    }
 
     const jobPayload = {
       title,
@@ -122,6 +172,7 @@ export async function POST(req: NextRequest) {
       status,
       companyLogo: urlData.publicUrl,
       userId,
+      profile_id: profileData.id,
     };
 
     const { data, error } = await supabaseAdmin
@@ -164,41 +215,52 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const { data: jobsData, error: jobsError } = await supabase
+    const supabase = await createClient();
+    const { data, error } = await supabase
       .from("jobs")
-      .select("*")
+      .select(
+        `
+   *,
+    profiles:profiles (
+      id,
+      email,
+      first_name,
+      last_name
+    )
+  `,
+      )
       .order("created_at", { ascending: false });
-    if (jobsError) {
+
+    if (error) {
       return NextResponse.json(
         {
+          error: error.message,
           success: false,
-          error: jobsError.message,
+          data: null,
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       {
+        message:
+          data.length === 0 ? "No jobs found" : "Jobs fetched successfully",
         success: true,
-        message: "All jobs fetch successfully...!",
-        data: jobsData,
+        data,
       },
       { status: 200 },
     );
-  } catch (error: any) {
+  } catch (err) {
     return NextResponse.json(
       {
+        error: "Internal server error",
         success: false,
-        error: error?.message,
+        data: null,
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }
