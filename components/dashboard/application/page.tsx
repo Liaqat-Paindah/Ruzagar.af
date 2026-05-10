@@ -1,7 +1,7 @@
-  'use client'
+"use client";
 
 import { useGetJobsByUser } from "@/hooks/useJobs";
-import React from "react";
+import JobsTable from "./jobs-table";
 
 export const Application = () => {
   const { data, isLoading, error } = useGetJobsByUser();
@@ -10,13 +10,8 @@ export const Application = () => {
   if (error) return <div>Something went wrong</div>;
 
   return (
-    <div>
-      {data?.map((job: any) => (
-        <div key={job.id}>
-          <h3>{job.title}</h3>
-          <p>{job.description}</p>
-        </div>
-      ))}
+    <div className="p-12">
+      <JobsTable data={data || []} />
     </div>
   );
 };
