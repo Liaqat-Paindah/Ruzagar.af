@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ThemeToggle } from "./ThemeToggle";
 import {
   Menu,
   X,
@@ -473,7 +472,6 @@ export const Navbar = () => {
           <div className="hidden lg:flex items-center gap-3">
     
             
-            <ThemeToggle />
             
             {user ? (
               <>
@@ -690,7 +688,6 @@ export const Navbar = () => {
           
           {/* Mobile Controls */}
           <div className="flex lg:hidden items-center gap-2">
-            <ThemeToggle />
             {user && (
               <motion.button
                 whileHover={{ scale: 1.1 }}

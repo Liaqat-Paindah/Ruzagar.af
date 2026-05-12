@@ -263,14 +263,14 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-linear-to-b from-slate-950 via-slate-900 to-slate-950">
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-indigo-500/5 rounded-full blur-3xl" />
         </div>
 
         <motion.div
@@ -323,7 +323,7 @@ export default function HomePage() {
           >
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all"
             >
               Get In Touch
               <ArrowRight className="h-4 w-4" />
@@ -455,7 +455,7 @@ export default function HomePage() {
 
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-0 md:left-1/2 transform md:-translate-x-px top-0 bottom-0 w-px bg-gradient-to-b from-blue-500 via-purple-500 to-transparent" />
+            <div className="absolute left-0 md:left-1/2 transform md:-translate-x-px top-0 bottom-0 w-px bg-linear-to-b from-blue-500 via-purple-500 to-transparent" />
 
             {experiences.map((exp, idx) => (
               <motion.div
@@ -492,7 +492,7 @@ export default function HomePage() {
                   <ul className="space-y-1.5 mb-3">
                     {exp.achievements.map((achievement, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                        <CheckCircle className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+                        <CheckCircle className="h-3.5 w-3.5 text-blue-400 mt-0.5 shrink-0" />
                         <span>{achievement}</span>
                       </li>
                     ))}
@@ -576,7 +576,7 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 border border-slate-700 rounded-2xl p-8"
+            className="bg-linear-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 border border-slate-700 rounded-2xl p-8"
           >
             <h2 className="text-2xl font-bold text-white mb-3">Ready to Build Something Great?</h2>
             <p className="text-slate-400 mb-6">
@@ -585,7 +585,7 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
               >
                 Start a Conversation
                 <ArrowRight className="h-4 w-4" />
