@@ -7,11 +7,11 @@ import AuthProvider from "@/components/provider/authContext";
 
 export const metadata: Metadata = {
   title: {
-    default: "Ruzagar.af",
-    template: "%s | Ruzagar.af",
+    default: "Liaqat Dev",
+    template: "%s | Liaqat Dev",
   },
   description:
-    "Afghanistan job, training, and tender portal built with Next.js 16.",
+    "Liaqat Dev built with Next.js 16.",
   icons: {
     icon: "/favicon.ico",
   },
