@@ -2,11 +2,12 @@
 
 import { useGetJobsByUser } from "@/hooks/useJobs";
 import JobsTable from "./jobs-table";
+import Loading from "@/app/loading";
 
 export const Application = () => {
   const { data, isLoading, error } = useGetJobsByUser();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div>Something went wrong</div>;
 
   return (

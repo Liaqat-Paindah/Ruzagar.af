@@ -4,45 +4,74 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
 import {
-  Briefcase,
-  GraduationCap,
-  LogIn,
-  UserPlus,
   Menu,
   X,
-  FileText,
   ChevronDown,
-  ClipboardList,
-  FileSearch,
-  Search,
-  Building2,
-  Bookmark,
-  MessageSquare,
-  User,
-  Settings,
-  PlusCircle,
-  Bell,
   LogOut,
+  Home,
+  User,
+  BrainCircuit,
+  FolderKanban,
+  MessageSquare,
+  LayoutDashboard,
+  FileText,
+  Settings,
+  Bell,
+  PlusCircle,
   Sparkles,
-  TrendingUp,
+  Zap,
+  Shield,
+  Activity,
+  Radar,
+  Target,
+  Compass,
+  Orbit,
+  Globe,
+  Cpu,
+  Eye,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useAuth } from "./provider/authContext";
 import { supabase } from "@/utils/supabase/supabase";
 
-const navLinks = [
+// Advanced Navigation Structure with Nexus DNA
+export const navLinks = [
   {
     to: "/",
-    label: "Jobs",
-    icon: Briefcase,
-    description: "Find your next career opportunity",
+    label: "Home",
+    description: "Welcome to my developer portfolio",
+    linear: "from-cyan-400 to-blue-500",
+    glow: "cyan",
   },
   {
-    to: "/training",
-    label: "Training",
-    icon: GraduationCap,
-    description: "Upskill with professional courses",
+    to: "/about",
+    label: "About",
+    description: "Learn more about my background and journey",
+    linear: "from-purple-400 to-pink-500",
+    glow: "purple",
+  },
+  {
+    to: "/skills",
+    label: "Skills",
+    description: "Frontend, backend, databases, and DevOps",
+    linear: "from-emerald-400 to-teal-500",
+    glow: "emerald",
+  },
+  {
+    to: "/projects",
+    label: "Projects",
+    description: "Explore my full stack applications",
+    linear: "from-orange-400 to-red-500",
+    glow: "orange",
+  },
+  {
+    to: "/contact",
+    label: "Contact",
+    description: "Get in touch for collaborations",
+    linear: "from-rose-400 to-pink-500",
+    glow: "rose",
   },
 ];
 
@@ -50,160 +79,331 @@ const UserLinks = [
   {
     to: "/dashboard",
     label: "Dashboard",
-    icon: Briefcase,
+    description: "Overview & Analytics",
+    icon: LayoutDashboard,
   },
   {
     to: "/dashboard/applications",
     label: "Applications",
+    description: "Track your applications",
     icon: FileText,
   },
   {
     to: "/messages",
     label: "Messages",
+    description: "Conversations & Updates",
     icon: MessageSquare,
   },
   {
     to: "/settings",
     label: "Settings",
+    description: "Preferences & Security",
     icon: Settings,
   },
 ];
 
-const tenderSubLinks = [
-  {
-    to: "/tenders",
-    label: "All Tenders",
-    icon: FileText,
-    linear: "from-primary to-emerald-600",
-  },
-  {
-    to: "/tenders?type=RFQ",
-    label: "RFQs",
-    icon: ClipboardList,
-    linear: "from-blue-500 to-cyan-500",
-  },
-  {
-    to: "/tenders?type=RFP",
-    label: "RFPs",
-    icon: FileSearch,
-    linear: "from-violet-500 to-purple-500",
-  },
-];
+const particleConfigs = Array.from({ length: 50 }, (_, index) => ({
+  id: index,
+  size: 1 + ((index * 17) % 30) / 10,
+  duration: 3 + ((index * 23) % 50) / 10,
+  delay: ((index * 19) % 50) / 10,
+  startX: (index * 29) % 100,
+  startY: (index * 37) % 100,
+  opacity: 0.2 + ((index * 13) % 30) / 100,
+  driftX: ((index % 5) - 2) * 18,
+}));
 
-const authLinks = [
-  { to: "/login", label: "Login", icon: LogIn },
-  { to: "/register", label: "Register", icon: UserPlus },
-];
+// Advanced 3D Tilt Effect Component
+const TiltCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 30 });
+  
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+  
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+  
+  return (
+    <motion.div
+      ref={ref}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// Advanced Particle System
+const NexusParticleField = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particleConfigs.map((particle) => {
+        return (
+          <motion.div
+            key={particle.id}
+            className="absolute rounded-full"
+            style={{
+              width: particle.size,
+              height: particle.size,
+              background: `radial-gradient(circle, rgba(6, 182, 212, ${particle.opacity}), rgba(59, 130, 246, 0))`,
+              left: `${particle.startX}%`,
+              top: `${particle.startY}%`,
+            }}
+            animate={{
+              y: [0, -100, -200],
+              x: [0, particle.driftX, 0],
+              opacity: [0, 1, 0],
+              scale: [0, 1.5, 0],
+            }}
+            transition={{
+              duration: particle.duration,
+              repeat: Infinity,
+              delay: particle.delay,
+              ease: "linear",
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+// Glowing Orb Effect
+const GlowingOrb = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+  
+  return (
+    <motion.div
+      className="fixed pointer-events-none z-50"
+      style={{
+        left: mousePosition.x - 150,
+        top: mousePosition.y - 150,
+      }}
+      animate={{
+        scale: [1, 1.2, 1],
+      }}
+      transition={{
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      <div className="w-72 h-72 rounded-full bg-linear-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 blur-3xl" />
+    </motion.div>
+  );
+};
 
 export const Navbar = () => {
   const { profile, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [tenderOpen, setTenderOpen] = useState(false);
-  const [mobileTenderOpen, setMobileTenderOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  const [isHoveringLogo, setIsHoveringLogo] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(3);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  const isTenderActive = pathname.startsWith("/tenders");
-
+  const logoRef = useRef<HTMLDivElement>(null);
+  
+  // Handle scroll effect with threshold
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  
+  // Handle click outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setTenderOpen(false);
-      }
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(e.target as Node)
-      ) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-
+  
+  // Close on route change
   useEffect(() => {
     setMobileOpen(false);
-    setTenderOpen(false);
     setUserMenuOpen(false);
   }, [pathname]);
-
+  
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut({ scope: "local" });
-
-    if (error) {
-      console.error("Logout error:", error);
-    } else {
+    if (!error) {
       setUserMenuOpen(false);
       setMobileOpen(false);
       router.replace("/login");
       router.refresh();
     }
   };
-
+  
+  // Animated text for logo
+  const logoTextVariants = {
+    initial: { opacity: 0, y: -20 },
+    animate: { opacity: 1, y: 0 },
+    hover: {
+      textShadow: "0 0 20px rgba(6, 182, 212, 0.5)",
+      transition: { duration: 0.3 },
+    },
+  };
+  
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative">
-            <div className="nexus-gradient h-8 w-8 rounded-lg flex items-center justify-center relative">
-              <Briefcase className="h-4 w-4 text-primary-foreground" />
-            </div>
-          </div>
-          <span className="font-display text-xl font-bold tracking-tight">
-            Ruzagar<span className="nexus-text-gradient">.af</span>
-          </span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-1">
-          {user ? (
-            <>
-              {UserLinks.map((link) => {
-                const active = pathname === link.to;
-                return (
-                  <Link
-                    key={link.to}
-                    href={link.to}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+    <>
+      <GlowingOrb />
+      
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all duration-700 ${
+          scrolled
+            ? "bg-black/90 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/50"
+            : "bg-linear-to-b from-black/50 to-transparent backdrop-blur-sm"
+        }`}
+      >
+        {/* Animated linear Border */}
+        <motion.div
+          className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-cyan-500/80 to-transparent"
+          animate={{
+            opacity: [0.5, 1, 0.5],
+            scaleX: [0.9, 1, 0.9],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        
+        {/* Noise Texture */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none" 
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        />
+        
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 relative">
+          {/* Advanced Logo with 3D Effect */}
+          <TiltCard className="relative">
+            <Link
+              href="/"
+              ref={logoRef as any}
+              onMouseEnter={() => setIsHoveringLogo(true)}
+              onMouseLeave={() => setIsHoveringLogo(false)}
+              className="group relative flex items-center gap-2 overflow-hidden"
+            >
+              {/* Logo Glow Effect */}
+              <motion.div
+                className="absolute inset-0 bg-linear-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 rounded-lg blur-xl"
+                animate={{
+                  opacity: isHoveringLogo ? 1 : 0,
+                  scale: isHoveringLogo ? 1.2 : 0.8,
+                }}
+                transition={{ duration: 0.3 }}
+              />
+              
+              <motion.span
+                variants={logoTextVariants}
+                initial="initial"
+                animate="animate"
+                whileHover="hover"
+                className="relative font-display text-xl font-bold bg-linear-to-r from-white via-white to-gray-400 bg-clip-text text-transparent"
+              >
+                Liaqat <span className="text-transparent bg-linear-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text">Dev</span>
+              </motion.span>
+              
+              {/* Animated underline with pulse */}
+              <motion.div
+                className="absolute -bottom-1 left-0 right-0 h-0.5 bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-full"
+                initial={{ scaleX: 0 }}
+                whileHover={{ scaleX: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+              
+              {/* Pulse Ring */}
+              <motion.div
+                className="absolute -inset-2 rounded-full border border-cyan-500/30"
+                animate={{
+                  scale: [1, 1.5, 1],
+                  opacity: [0.5, 0, 0.5],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </Link>
+          </TiltCard>
+          
+          {/* Desktop Navigation with Advanced Effects */}
+          <div className="hidden lg:flex items-center gap-1">
+            {(user ? UserLinks : navLinks).map((link, index) => {
+              const active = pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  href={link.to}
+                  onMouseEnter={() => setHoveredLink(link.to)}
+                  onMouseLeave={() => setHoveredLink(null)}
+                  className="relative group"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`relative px-4 py-2 rounded-sm text-sm font-medium transition-all duration-300 ${
                       active
-                        ? "bg-linear-to-r from-primary/10 via-emerald-500/10 to-blue-500/10 text-primary border border-primary/20"
-                        : "text-muted-foreground hover:text-foreground hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5"
+                        ? "text-cyan-400"
+                        : "text-gray-400 hover:text-white"
                     }`}
                   >
-                    <link.icon className="h-4 w-4" />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </>
-          ) : (
-            <>
-              {navLinks.map((link) => {
-                const active = pathname === link.to;
-                return (
-                  <Link
-                    key={link.to}
-                    href={link.to}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all group ${
-                      active
-                        ? "bg-linear-to-r from-primary/10 via-emerald-500/10 to-blue-500/10 text-primary border border-primary/20"
-                        : "text-muted-foreground hover:text-foreground hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5"
-                    }`}
-                  >
-                    <link.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
-                    {link.label}
+                    {/* Active Background with Animation */}
                     {active && (
                       <motion.div
                         layoutId="activeNav"
-                        className="absolute bottom-0 left-2 right-2 h-0.5 bg-linear-to-r from-primary via-emerald-500 to-blue-500"
+                        className="absolute inset-0 bg-linear-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 rounded-sm border border-cyan-500/30"
                         transition={{
                           type: "spring",
                           stiffness: 500,
@@ -211,375 +411,448 @@ export const Navbar = () => {
                         }}
                       />
                     )}
-                  </Link>
-                );
-              })}
-            </>
-          )}
-
-          {!user ? (
-            <>
-              {" "}
-              {/* Tenders Mega Menu */}
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setTenderOpen(!tenderOpen)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isTenderActive
-                      ? "bg-linear-to-r from-primary/10 via-emerald-500/10 to-blue-500/10 text-primary border border-primary/20"
-                      : "text-muted-foreground hover:text-foreground hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5"
-                  }`}
-                >
-                  <FileText className="h-4 w-4" />
-                  Tenders
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 transition-transform duration-200 ${tenderOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                <AnimatePresence>
-                  {tenderOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full left-0 mt-2 w-64 rounded-xl border border-border bg-popover/95 backdrop-blur-xl shadow-2xl overflow-hidden z-50"
-                    >
-                      <div className="p-2">
-                        {tenderSubLinks.map((link) => (
-                          <Link
-                            key={link.label}
-                            href={link.to}
-                            onClick={() => setTenderOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-popover-foreground hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all group"
-                          >
-                            <div
-                              className={`h-8 w-8 rounded-lg bg-linear-to-br ${link.linear} flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow`}
-                            >
-                              <link.icon className="h-4 w-4 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="font-medium">{link.label}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {link.label === "All Tenders" &&
-                                  "Browse all opportunities"}
-                                {link.label === "RFQs" &&
-                                  "Request for Quotations"}
-                                {link.label === "RFPs" &&
-                                  "Request for Proposals"}
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                      <div className="border-t border-border p-3 bg-linear-to-r from-primary/5 via-emerald-500/5 to-blue-500/5">
-                        <div className="flex items-center gap-2 text-xs">
-                          <TrendingUp className="h-3.5 w-3.5 text-primary" />
-                          <span className="text-muted-foreground">
-                            <span className="font-semibold text-foreground">
-                              24
-                            </span>{" "}
-                            new tenders this week
-                          </span>
+                    
+                    {/* Label */}
+                    <span className="relative z-10">{link.label}</span>
+                    
+                    {/* Active Indicator Dot */}
+                    {active && (
+                      <motion.div
+                        layoutId="activeDot"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-cyan-400"
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    
+                    {/* Hover Glow Effect */}
+                    {hoveredLink === link.to && !active && (
+                      <motion.div
+                        layoutId="hoverNav"
+                        className="absolute inset-0 bg-linear-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 rounded-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </motion.div>
+                  
+                  {/* Advanced Tooltip with Arrow */}
+                  <AnimatePresence>
+                    {hoveredLink === link.to && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-3"
+                      >
+                        <div className="relative">
+                          {/* Arrow */}
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-gray-900/95 border-l border-t border-white/10" />
+                          {/* Content */}
+                          <div className="relative px-4 py-2 bg-gray-900/95 backdrop-blur-xl rounded-lg border border-white/10 shadow-2xl">
+                            <p className="text-xs text-gray-300 whitespace-nowrap">
+                              {link.description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
-
-        {/* Right Section */}
-        <div className="hidden lg:flex items-center gap-2">
-          <ThemeToggle />
-
-          {!user ? (
-            <>
-              {authLinks.map((link) => {
-                const isPrimary = link.to === "/register";
-                return (
-                  <Link
-                    key={link.to}
-                    href={link.to}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      isPrimary
-                        ? "nexus-gradient text-primary-foreground hover:opacity-90 shadow-lg hover:shadow-xl"
-                        : "border border-border text-foreground hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5"
-                    }`}
-                  >
-                    <link.icon className="h-4 w-4" />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </>
-          ) : (
-            <>
-              {/* Notifications */}
-              <button className="relative p-2 rounded-lg hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-linear-to-r from-primary to-emerald-600 ring-2 ring-background" />
-              </button>
-
-              {/* Create Job Button */}
-              <Link
-                href="/dashboard/jobs/create"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-linear-to-r from-primary/10 via-emerald-500/10 to-blue-500/10 border border-primary/20 text-primary hover:border-primary/40 hover:shadow-md transition-all"
-              >
-                <PlusCircle className="h-4 w-4" />
-                Post Job
-              </Link>
-
-              {/* User Menu */}
-              <div className="relative" ref={userMenuRef}>
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all"
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Link>
+              );
+            })}
+          </div>
+          
+          {/* Right Section with Advanced Components */}
+          <div className="hidden lg:flex items-center gap-3">
+    
+            
+            <ThemeToggle />
+            
+            {user ? (
+              <>
+                {/* Advanced Notification Center */}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="relative group"
                 >
-                  <div className="h-8 w-8 rounded-full bg-linear-to-br from-primary via-emerald-500 to-blue-500 flex items-center justify-center text-white font-medium shadow-md">
-                    {user.email?.[0].toUpperCase() || "U"}
-                  </div>
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                <AnimatePresence>
-                  {userMenuOpen && (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    className="relative p-2 rounded-sm hover:bg-white/5 transition-all"
+                    animate={{
+                      boxShadow: notificationCount > 0 ? "0 0 10px rgba(6, 182, 212, 0.5)" : "none",
+                    }}
+                  >
+                    <Bell className="h-5 w-5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
+                    
+                    {/* Animated Notification Badge */}
+                    {notificationCount > 0 && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1"
+                      >
+                        <div className="relative">
+                          <div className="absolute inset-0 rounded-full bg-red-500 animate-ping" />
+                          <div className="relative min-w-4.5 h-4.5 px-1 rounded-full bg-linear-to-r from-red-500 to-pink-500 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-white">
+                              {notificationCount > 9 ? "9+" : notificationCount}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.button>
+                  
+                  {/* Notification Preview on Hover */}
+                  <AnimatePresence>
+                    {notificationCount > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileHover={{ opacity: 1, y: 0 }}
+                        className="absolute top-full right-0 mt-2 w-80 rounded-sm bg-gray-900/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden"
+                      >
+                        <div className="p-3 border-b border-white/10">
+                          <p className="text-sm font-medium">Notifications</p>
+                        </div>
+                        <div className="p-2">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
+                              <p className="text-xs text-gray-300">New notification {i}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+                
+                {/* Advanced Create Button */}
+                <Link
+                  href="/dashboard/jobs/create"
+                  className="group relative overflow-hidden"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="relative flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-medium bg-linear-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 border border-cyan-500/30 text-cyan-400 overflow-hidden"
+                  >
+                    {/* Button Glow Effect */}
                     <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full right-0 mt-2 w-56 rounded-xl border border-border bg-popover/95 backdrop-blur-xl shadow-2xl overflow-hidden z-50"
-                    >
-                      <div className=" p-3 border-b border-border bg-linear-to-r from-primary/5 via-emerald-500/5 to-blue-500/5">
-                                                <p className=" py-2 text-md font-medium text-foreground truncate">
-                            {profile?.first_name && profile?.last_name}
-                          </p>
-                        <p className="text-sm font-medium text-foreground truncate">
-
-                          {user.email}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Personal Account
-                        </p>
+                      className="absolute inset-0 bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ filter: "blur(10px)" }}
+                    />
+                    
+                    <PlusCircle className="h-4 w-4 relative z-10 group-hover:rotate-90 transition-transform duration-300" />
+                    <span className="relative z-10">Post Job</span>
+                  </motion.div>
+                </Link>
+                
+                {/* Advanced User Menu */}
+                <div className="relative" ref={userMenuRef}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 p-1.5 rounded-sm hover:bg-white/5 transition-all group"
+                  >
+                    <div className="relative">
+                      {/* Avatar Ring Animation */}
+                      <motion.div
+                        className="absolute inset-0 rounded-full bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500"
+                        animate={{
+                          rotate: 360,
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        style={{ padding: 2 }}
+                      />
+                      <div className="relative h-8 w-8 rounded-full bg-linear-to-br from-cyan-500 via-blue-500 to-purple-600 flex items-center justify-center text-white font-medium shadow-lg">
+                        {user.email?.[0].toUpperCase() || "U"}
                       </div>
-                      <div className="p-2">
-                        <button
-                          type="button"
-                          onClick={handleLogout}
-                          className="flex items-center gap-3 cursor-pointer w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-all"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          Sign Out
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Toggle */}
-        <div className="flex lg:hidden items-center gap-2">
-          <ThemeToggle />
-          {user && (
-            <button className="relative p-2 rounded-lg hover:bg-secondary">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
-            </button>
-          )}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 rounded-lg hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all"
-          >
-            {mobileOpen ? (
-              <X className="h-5 w-5" />
+                      
+                      {/* Online Status */}
+                      <motion.div
+                        className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-black"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                        }}
+                      />
+                    </div>
+                    
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 text-gray-400 transition-all duration-300 ${
+                        userMenuOpen ? "rotate-180" : "group-hover:rotate-12"
+                      }`}
+                    />
+                  </motion.button>
+                  
+                  {/* Advanced Dropdown Menu */}
+                  <AnimatePresence>
+                    {userMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2, type: "spring", stiffness: 400 }}
+                        className="absolute top-full right-0 mt-2 w-72 rounded-sm bg-gray-900/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden z-50"
+                      >
+                        {/* User Info Header with linear */}
+                        <div className="relative p-4 border-b border-white/10 bg-linear-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10">
+                          <motion.div
+                            className="absolute inset-0 bg-linear-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5"
+                            animate={{
+                              x: ["0%", "100%", "0%"],
+                            }}
+                            transition={{
+                              duration: 3,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                          />
+                          
+                          <div className="relative">
+                            <p className="text-sm font-bold bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                              {profile?.first_name && profile?.last_name
+                                ? `${profile.first_name} ${profile.last_name}`
+                                : user.email?.split('@')[0] || "Nexus User"}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate mt-1">
+                              {user.email}
+                            </p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <div className="relative">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                <div className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-green-500 animate-ping" />
+                              </div>
+                              <span className="text-xs text-green-400 font-medium">Active Now</span>
+                              <div className="w-px h-3 bg-white/10 mx-1" />
+                              <span className="text-xs text-gray-400">Nexus Pro</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Menu Items */}
+                        <div className="p-2">
+                          <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all group"
+                          >
+                            <motion.div
+                              whileHover={{ rotate: 180 }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              <LogOut className="h-4 w-4" />
+                            </motion.div>
+                            <span>Sign Out</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </>
             ) : (
-              <Menu className="h-5 w-5" />
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Link
+                  href="/login"
+                  className="group relative overflow-hidden px-5 py-2 rounded-sm text-sm font-medium border border-white/10 text-gray-300 hover:text-white transition-all duration-300"
+                >
+                  <span className="relative z-10">Login</span>
+                  <motion.div
+                    className="absolute inset-00"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Link>
+              </motion.div>
             )}
-          </button>
+          </div>
+          
+          {/* Mobile Controls */}
+          <div className="flex lg:hidden items-center gap-2">
+            <ThemeToggle />
+            {user && (
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative p-2 rounded-sm hover:bg-white/5"
+              >
+                <Bell className="h-5 w-5" />
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-linear-to-r from-red-500 to-pink-500 text-[8px] font-bold text-white flex items-center justify-center">
+                    {notificationCount}
+                  </span>
+                )}
+              </motion.button>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="p-2 rounded-sm hover:bg-white/5 transition-all"
+            >
+              {mobileOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </motion.button>
+          </div>
         </div>
-      </div>
-
-      {/* Mobile Menu */}
+      </nav>
+      
+      {/* Advanced Mobile Menu with Slide-in Animation */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="lg:hidden overflow-hidden border-t border-border bg-background/95 backdrop-blur-xl"
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed top-16 right-0 bottom-0 w-full max-w-sm bg-black/95 backdrop-blur-2xl border-l border-white/10 shadow-2xl z-40 lg:hidden overflow-y-auto"
           >
-            <div className="p-4 flex flex-col gap-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
-              {/* Quick Search Mobile */}
-              <div className="relative mb-2">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-
+            {/* Mobile Menu Header with Particle Effect */}
+            <div className="relative p-4 border-b border-white/10 bg-linear-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5">
+              <NexusParticleField />
+              <p className="text-xs text-cyan-400 font-mono">NEXUS_NAV</p>
+            </div>
+            
+            <div className="p-4 flex flex-col gap-2">
               {user ? (
                 <>
-                  {/* User Profile Mobile */}
-                  <div className="flex items-center gap-3 p-3 mb-2 rounded-lg bg-linear-to-r from-primary/5 via-emerald-500/5 to-blue-500/5 border border-border">
-                    <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary via-emerald-500 to-blue-500 flex items-center justify-center text-white font-medium">
-                      {user.email?.[0].toUpperCase() || "U"}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {user.email}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Personal Account
-                      </p>
-                    </div>
-                  </div>
-
-                  {UserLinks.map((link) => (
-                    <Link
-                      key={link.to}
-                      href={link.to}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <link.icon className="h-4 w-4" />
-                        {link.label}
-                      </span>
-                    </Link>
-                  ))}
-
-                  <Link
-                    href="/jobs/create"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-primary border border-primary/20 bg-linear-to-r from-primary/10 via-emerald-500/10 to-blue-500/10 mt-2"
+                  {/* User Profile Card */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-3 p-3 mb-3 rounded-sm bg-linear-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-white/10"
                   >
-                    <PlusCircle className="h-4 w-4" />
-                    Post a Job
-                  </Link>
-                </>
-              ) : (
-                navLinks.map((link) => (
-                  <Link
-                    key={link.to}
-                    href={link.to}
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-start gap-3 px-3 py-3 rounded-lg hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all group"
-                  >
-                    <link.icon className="h-5 w-5 mt-0.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <div className="flex-1">
-                      <div className="font-medium">{link.label}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {link.description}
+                    <div className="relative">
+                      <div className="absolute inset-0 rounded-full bg-linear-to-r from-cyan-500 to-purple-500 animate-spin" style={{ animationDuration: "2s" }} />
+                      <div className="relative h-12 w-12 rounded-full bg-linear-to-br from-cyan-500 via-blue-500 to-purple-600 flex items-center justify-center text-white font-medium shadow-lg">
+                        {user.email?.[0].toUpperCase() || "U"}
                       </div>
                     </div>
-                  </Link>
-                ))
-              )}
-
-              {/* Mobile Tenders Accordion */}
-              {!user ? (
-                <>
-                  {" "}
-                  <div className="mt-2">
-                    <button
-                      onClick={() => setMobileTenderOpen(!mobileTenderOpen)}
-                      className="flex items-center justify-between w-full px-3 py-3 rounded-lg text-sm font-medium hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all"
-                    >
-                      <span className="flex items-center gap-3">
-                        <FileText className="h-4 w-4" />
-                        Tenders
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform duration-200 ${mobileTenderOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    <AnimatePresence>
-                      {mobileTenderOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden ml-4"
-                        >
-                          {tenderSubLinks.map((link) => (
-                            <Link
-                              key={link.label}
-                              href={link.to}
-                              onClick={() => {
-                                setMobileOpen(false);
-                                setMobileTenderOpen(false);
-                              }}
-                              className="flex items-center gap-3 pl-8 pr-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all"
-                            >
-                              <div
-                                className={`h-6 w-6 rounded bg-linear-to-br ${link.linear} flex items-center justify-center`}
-                              >
-                                <link.icon className="h-3.5 w-3.5 text-white" />
-                              </div>
-                              {link.label}
-                            </Link>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
-
-              <div className="border-t border-border my-3" />
-
-              {!user ? (
-                <>
-                  {authLinks.map((link) => (
-                    <Link
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white truncate">
+                        {profile?.first_name && profile?.last_name
+                          ? `${profile.first_name} ${profile.last_name}`
+                          : user.email?.split('@')[0] || "Nexus User"}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        <span className="text-xs text-green-400">Active</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  {/* Navigation Links with Stagger Animation */}
+                  {UserLinks.map((link, index) => (
+                    <motion.div
                       key={link.to}
-                      href={link.to}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-linear-to-r hover:from-primary/5 hover:via-emerald-500/5 hover:to-blue-500/5 transition-all"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
                     >
-                      <link.icon className="h-4 w-4" />
-                      {link.label}
-                    </Link>
+                      <Link
+                        href={link.to}
+                        onClick={() => setMobileOpen(false)}
+                        className="group block px-3 py-3 rounded-sm hover:bg-white/5 transition-all"
+                      >
+                        <div className="font-medium group-hover:text-cyan-400 transition-colors">
+                          {link.label}
+                        </div>
+                        <div className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">
+                          {link.description}
+                        </div>
+                      </Link>
+                    </motion.div>
                   ))}
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium nexus-gradient text-primary-foreground mt-2"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Get Started
-                  </Link>
                 </>
               ) : (
-                <button
+                <>
+                  {/* Navigation Links with Stagger Animation */}
+                  {navLinks.map((link, index) => (
+                    <motion.div
+                      key={link.to}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Link
+                        href={link.to}
+                        onClick={() => setMobileOpen(false)}
+                        className="group block px-3 py-3 rounded-sm hover:bg-white/5 transition-all"
+                      >
+                        <div className="font-medium group-hover:text-cyan-400 transition-colors">
+                          {link.label}
+                        </div>
+                        <div className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">
+                          {link.description}
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </>
+              )}
+              
+              <div className="border-t border-white/10 my-3" />
+              
+              {!user ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-center px-3 py-3 rounded-sm text-sm font-medium bg-linear-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 border border-cyan-500/30 text-cyan-400 transition-all"
+                  >
+                    <span>Login to Nexus</span>
+                    <Sparkles className="h-4 w-4 ml-2" />
+                  </Link>
+                </motion.div>
+              ) : (
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-3 py-3 cursor-pointer rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-all"
+                  className="flex items-center justify-center gap-2 px-3 py-3 rounded-sm text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all group"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-4 w-4 group-hover:rotate-180 transition-transform duration-300" />
                   Sign Out
-                </button>
+                </motion.button>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+      
+      {/* Advanced Particle Background */}
+      <NexusParticleField />
+    </>
   );
 };
