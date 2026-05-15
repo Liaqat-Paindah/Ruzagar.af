@@ -328,14 +328,14 @@ export default function HomePage() {
               Get In Touch
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <a
-              href="/Liaqat_Paindah_CV.pdf"
+            <Link
+              href="cv.pdf"
               download
               className="inline-flex items-center gap-2 px-5 py-2.5 border border-slate-600 text-slate-300 font-medium rounded-lg hover:bg-slate-800/50 transition-all"
             >
               <Download className="h-4 w-4" />
               Download CV
-            </a>
+            </Link>
           </motion.div>
 
           <motion.div
