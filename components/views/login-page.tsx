@@ -16,9 +16,10 @@ import {
   Fingerprint,
   ChartNoAxesCombinedIcon,
   GitBranch,
-
 } from "lucide-react";
-import { useState } from "react";
+import { use, useState } from "react";
+import { supabase } from "@/utils/supabase/supabase";
+import { useRouter } from "next/navigation";
 
 const LoginSchema = Yup.object({
   email: Yup.string()
@@ -39,6 +40,7 @@ type LoginType = {
 };
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,12 +62,22 @@ export default function LoginPage() {
 
     validationSchema: LoginSchema,
 
-    onSubmit: async (values) => {
+    onSubmit: async (values, { setSubmitting, setErrors }) => {
       setIsLoading(true);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log(values);
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+      if (error) {
+        setErrors({ password: error.message });
+        setIsLoading(false);
+
+        return;
+      }
       setIsLoading(false);
+      setSubmitting(false);
+      router.push("/dashboard");
     },
   });
 
@@ -109,9 +121,7 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-center mb-8"
-          >
-         
-          </motion.div>
+          ></motion.div>
 
           {/* Login Card */}
           <motion.div
@@ -121,17 +131,16 @@ export default function LoginPage() {
             className="relative group"
           >
             {/* Glow Effect */}
-            <div className="absolute -inset-0.5 bg-linear-to-r from-blue-600 to-purple-600 rounded-sm blur-sm opacity-20 group-hover:opacity-40 transition duration-500" />
-            
+            <div className="absolute -inset-0.5  rounded-sm blur-sm opacity-20 group-hover:opacity-40 transition duration-500" />
+
             {/* Card Content */}
             <div className="relative bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 rounded-sm overflow-hidden">
               <div className="p-8">
                 {/* Header */}
                 <div className="text-center mb-8">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-linear-to-r from-blue-600/20 to-purple-600/20 flex items-center justify-center border border-blue-500/20">
-                    <Shield className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
+                  <h1 className="text-2xl font-bold text-white mb-2">
+                    Welcome Back
+                  </h1>
                   <p className="text-slate-400 text-sm">
                     Sign in to access your account
                   </p>
@@ -140,7 +149,10 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Email Field */}
                   <div className="space-y-1.5">
-                    <label htmlFor="email" className="text-sm font-medium text-slate-300">
+                    <label
+                      htmlFor="email"
+                      className="text-sm font-medium text-slate-300"
+                    >
                       Email Address
                     </label>
                     <div className="relative">
@@ -175,7 +187,10 @@ export default function LoginPage() {
 
                   {/* Password Field */}
                   <div className="space-y-1.5">
-                    <label htmlFor="password" className="text-sm font-medium text-slate-300">
+                    <label
+                      htmlFor="password"
+                      className="text-sm font-medium text-slate-300"
+                    >
                       Password
                     </label>
                     <div className="relative">
@@ -228,15 +243,19 @@ export default function LoginPage() {
                           id="remember"
                           name="remember"
                           checked={values.remember}
-                          onChange={(e) => setFieldValue("remember", e.target.checked)}
+                          onChange={(e) =>
+                            setFieldValue("remember", e.target.checked)
+                          }
                           onBlur={handleBlur}
                           className="sr-only"
                         />
-                        <div className={`w-4 h-4 rounded border transition-all duration-200 flex items-center justify-center ${
-                          values.remember
-                            ? "bg-blue-500 border-blue-500"
-                            : "border-slate-600 bg-slate-800/50 group-hover:border-slate-500"
-                        }`}>
+                        <div
+                          className={`w-4 h-4 rounded border transition-all duration-200 flex items-center justify-center ${
+                            values.remember
+                              ? "bg-blue-500 border-blue-500"
+                              : "border-slate-600 bg-slate-800/50 group-hover:border-slate-500"
+                          }`}
+                        >
                           {values.remember && (
                             <CheckCircle className="h-3 w-3 text-white" />
                           )}
@@ -284,7 +303,9 @@ export default function LoginPage() {
                       <div className="w-full border-t border-slate-700" />
                     </div>
                     <div className="relative flex justify-center text-xs">
-                      <span className="px-2 bg-slate-900 text-slate-500">Or continue with</span>
+                      <span className="px-2 bg-slate-900 text-slate-500">
+                        Or continue with
+                      </span>
                     </div>
                   </div>
 
